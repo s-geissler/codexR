@@ -1,5 +1,12 @@
 test_that("resolve_codex_bin falls back to PATH", {
-  expect_true(nzchar(codexR:::resolve_codex_bin("codex")))
+  expect_identical(
+    codexR:::resolve_codex_bin("codex"),
+    unname(Sys.which("codex")[[1]])
+  )
+})
+
+test_that("resolve_codex_bin returns empty string for missing command", {
+  expect_identical(codexR:::resolve_codex_bin("definitely-not-a-real-codex-bin"), "")
 })
 
 test_that("object metadata for data frames is schema-only", {
