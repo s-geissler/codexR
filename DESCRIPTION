@@ -1,0 +1,22 @@
+Package: codexR
+Title: Codex Integration for RStudio Server
+Version: 0.0.1
+Authors@R: 
+    person(given = "Stefan",
+           family = "Geißler",
+           role = c("aut", "cre"),
+           email = "code@stefan-geissler.net")
+Description: Call the Codex CLI from an open R file in RStudio or
+    RStudio Server. The package captures active editor context and
+    sends it alongside a prompt to the local Codex CLI.
+License: MIT + file LICENSE
+URL: https://github.com/s-geissler/codexR
+BugReports: https://github.com/s-geissler/codexR/issues
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports:
+    rstudioapi
+Suggests:
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

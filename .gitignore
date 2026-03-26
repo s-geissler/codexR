@@ -1,0 +1,15 @@
+.Rhistory
+.Rapp.history
+.RData
+.Ruserdata
+.Rproj.user
+.DS_Store
+*.tar.gz
+.rlib
+.rlib2
+check
+*.Rcheck
+src/*.o
+src/*.so
+src/*.dll
+src/*.dylib

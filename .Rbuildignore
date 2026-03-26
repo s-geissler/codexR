@@ -1,0 +1,5 @@
+^README\.md$
+^\.rlib.*$
+^rstudiocodex_.*\.tar\.gz$
+^codexR_.*\.tar\.gz$
+^\.github$
