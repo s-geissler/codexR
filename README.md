@@ -10,7 +10,7 @@ From a local source checkout:
 install.packages(".", repos = NULL, type = "source")
 ```
 
-From GitHub after publication:
+From GitHub via remotes:
 
 ```r
 remotes::install_github("s-geissler/codexR")
