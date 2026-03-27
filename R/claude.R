@@ -165,18 +165,20 @@ claude <- function(prompt,
   )
   prompt_parts <- claude_prompt(prompt = prompt, context = context)
 
-  # Pass a short single-line instruction via -p and the full multi-line context
-  # via stdin. Passing multi-line content as a -p argument causes the shell to
-  # interpret each line as a separate command.
+  # system2() on Unix builds a shell command string without quoting individual
+  # args, then passes it to /bin/sh -c. Any shell metacharacter in an arg
+  # (semicolons, parentheses, newlines, etc.) is interpreted by the shell.
+  # shQuote() wraps each variable arg in single quotes so the shell treats it
+  # as a literal string.
   args <- c(
-    "-p", prompt_parts$instruction,
+    "-p", shQuote(prompt_parts$instruction),
     "--output-format", "text",
     "--bare",
     "--no-session-persistence"
   )
 
   if (!is.null(model) && nzchar(model)) {
-    args <- c(args, "--model", model)
+    args <- c(args, "--model", shQuote(model))
   }
 
   if (length(claude_args) > 0L) {
