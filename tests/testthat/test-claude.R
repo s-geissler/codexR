@@ -23,11 +23,13 @@ test_that("validate_claude_r_code rejects empty response", {
   )
 })
 
-test_that("claude_prompt references claude() not codex()", {
+test_that("claude_prompt returns single-line instruction and multi-line context", {
   ctx <- list(source = "R", working_directory = "/tmp")
-  prompt_text <- codexR:::claude_prompt("list files", ctx)
-  expect_true(grepl("claude()", prompt_text, fixed = TRUE))
-  expect_false(grepl("codex()", prompt_text, fixed = TRUE))
+  parts <- codexR:::claude_prompt("list files", ctx)
+  expect_named(parts, c("instruction", "context"))
+  expect_false(grepl("\n", parts$instruction, fixed = TRUE))
+  expect_true(grepl("\n", parts$context, fixed = TRUE))
+  expect_false(grepl("codex()", parts$instruction, fixed = TRUE))
 })
 
 test_that("resolve_claude_rows finds claude() call lines", {

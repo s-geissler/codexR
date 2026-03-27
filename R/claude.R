@@ -163,10 +163,13 @@ claude <- function(prompt,
     include_session = include_session,
     object_metadata = object_metadata
   )
-  prompt_text <- claude_prompt(prompt = prompt, context = context)
+  prompt_parts <- claude_prompt(prompt = prompt, context = context)
 
+  # Pass a short single-line instruction via -p and the full multi-line context
+  # via stdin. Passing multi-line content as a -p argument causes the shell to
+  # interpret each line as a separate command.
   args <- c(
-    "-p", prompt_text,
+    "-p", prompt_parts$instruction,
     "--output-format", "text",
     "--bare",
     "--no-session-persistence"
@@ -186,6 +189,7 @@ claude <- function(prompt,
   stdout_lines <- system2(
     command = claude_bin,
     args = args,
+    input = prompt_parts$context,
     stdout = TRUE,
     stderr = stderr_target
   )
@@ -264,26 +268,28 @@ format_claude_error <- function(status, cli_log) {
 }
 
 claude_prompt <- function(prompt, context) {
-  sections <- c(
-    "You are assisting from an R session launched from RStudio or RStudio Server.",
-    "Use the provided editor context as the source of truth when relevant.",
-    "Reply for the R user who invoked claude() from their script.",
-    "Return only R code.",
-    "Do not describe what the code would do.",
-    "Do not show example output or simulated results.",
-    "Do not wrap the response in Markdown fences.",
-    "If the user asks for an action like listing files, write R code that performs that action.",
-    "Any provided object information contains metadata only, not raw data values.",
-    "Do not assume access to object contents beyond the supplied metadata.",
-    "",
-    "User request to implement as R code:",
-    prompt,
-    "",
-    "R context:"
+  # instruction goes to -p: must be a single line with no embedded newlines,
+  # because the shell interprets newlines in CLI arguments as command separators.
+  instruction <- paste0(
+    "R coding assistant in RStudio. ",
+    "R session context is in stdin. ",
+    "Rules: return ONLY valid R code; no prose; no markdown fences; no example output; ",
+    "object metadata in stdin is schema-only, never raw values. ",
+    "Request: ",
+    gsub("\n+", " ", trimws(prompt))
   )
 
-  context_lines <- format_context(context)
-  paste(c(sections, context_lines), collapse = "\n")
+  # context goes to stdin: safe for multi-line content
+  context_lines <- c(
+    "R session context",
+    "=================",
+    format_context(context)
+  )
+
+  list(
+    instruction = instruction,
+    context = paste(context_lines, collapse = "\n")
+  )
 }
 
 claude_write_target <- function(call_text, prompt) {
