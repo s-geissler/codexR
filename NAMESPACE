@@ -1,3 +1,8 @@
+export(claude)
+export(claude_available)
+export(claude_config)
+export(claude_init)
+export(claude_last_file)
 export(codex)
 export(codex_available)
 export(codex_config)
