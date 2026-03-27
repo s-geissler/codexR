@@ -91,6 +91,8 @@ codex_init(
 )
 ```
 
+With `quiet = TRUE`, `codexR` suppresses both its own console printing and normal stdout/stderr chatter from the Codex CLI during successful runs.
+
 Write the final Codex response to a file instead of printing it:
 
 ```r

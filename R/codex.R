@@ -124,18 +124,22 @@ codex <- function(prompt,
     args <- c(args, codex_args)
   }
 
+  cli_log <- tempfile("codex-cli-", fileext = ".log")
+  stdout_target <- if (isTRUE(quiet)) cli_log else ""
+  stderr_target <- if (isTRUE(quiet)) cli_log else ""
+
   status <- system2(
     command = codex_bin,
     args = args,
     input = prompt_text,
-    stdout = "",
-    stderr = ""
+    stdout = stdout_target,
+    stderr = stderr_target
   )
 
   .codex_last_response_file(output_file)
 
   if (!identical(status, 0L)) {
-    stop(sprintf("Codex CLI exited with status %s.", status), call. = FALSE)
+    stop(format_codex_error(status, cli_log), call. = FALSE)
   }
 
   response <- readLines(output_file, warn = FALSE, encoding = "UTF-8")
@@ -176,6 +180,25 @@ resolve_codex_bin <- function(codex_bin = NULL) {
   }
 
   unname(Sys.which("codex")[[1]])
+}
+
+format_codex_error <- function(status, cli_log) {
+  if (!file.exists(cli_log)) {
+    return(sprintf("Codex CLI exited with status %s.", status))
+  }
+
+  log_lines <- readLines(cli_log, warn = FALSE, encoding = "UTF-8")
+  log_lines <- log_lines[nzchar(trimws(log_lines))]
+  if (length(log_lines) == 0L) {
+    return(sprintf("Codex CLI exited with status %s.", status))
+  }
+
+  snippet <- utils::tail(log_lines, 10L)
+  sprintf(
+    "Codex CLI exited with status %s. Last output:\n%s",
+    status,
+    paste(snippet, collapse = "\n")
+  )
 }
 
 codex_context <- function(scope = c("document", "selection", "none"),

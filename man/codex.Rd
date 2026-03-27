@@ -38,8 +38,9 @@ codex(
   current \code{codex_init()} setting.}
 
   \item{quiet}{Whether to suppress printing the returned code to the console when
-  \code{output = "console"}. Defaults to the current \code{codex_init()}
-  setting.}
+  \code{output = "console"}, and whether to suppress normal Codex CLI
+  stdout/stderr output during successful runs. Defaults to the current
+  \code{codex_init()} setting.}
 
   \item{codex_bin}{Optional explicit Codex binary path or command name. Defaults
   to the current \code{codex_init()} setting, then \code{PATH}.}

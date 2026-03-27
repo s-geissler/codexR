@@ -11,7 +11,9 @@ codex_init(codex_bin = NULL, include_session = TRUE, write_back = TRUE, quiet = 
 
   \item{write_back}{Default for whether \code{codex()} comments the call line and inserts the response into the editor.}
 
-  \item{quiet}{Default for whether \code{codex()} suppresses console output.}
+  \item{quiet}{Default for whether \code{codex()} suppresses its own console
+  output and the normal stdout/stderr output of the Codex CLI during successful
+  runs.}
 }
 \value{
 An invisible list of the active session defaults.
