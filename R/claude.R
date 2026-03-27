@@ -172,9 +172,7 @@ claude <- function(prompt,
   # as a literal string.
   args <- c(
     "-p", shQuote(prompt_parts$instruction),
-    "--output-format", "text",
-    "--bare",
-    "--no-session-persistence"
+    "--output-format", "text"
   )
 
   if (!is.null(model) && nzchar(model)) {
@@ -202,7 +200,7 @@ claude <- function(prompt,
   }
 
   if (!identical(as.integer(status), 0L)) {
-    stop(format_claude_error(status, cli_log), call. = FALSE)
+    stop(format_claude_error(status, cli_log, stdout_lines), call. = FALSE)
   }
 
   response_text <- normalize_codex_response(paste(stdout_lines, collapse = "\n"))
@@ -250,13 +248,19 @@ resolve_claude_bin <- function(claude_bin = NULL) {
   unname(Sys.which("claude")[[1]])
 }
 
-format_claude_error <- function(status, cli_log) {
-  if (!file.exists(cli_log)) {
-    return(sprintf("Claude CLI exited with status %s.", status))
+format_claude_error <- function(status, cli_log, stdout_lines = NULL) {
+  log_lines <- character()
+
+  if (file.exists(cli_log)) {
+    log_lines <- readLines(cli_log, warn = FALSE, encoding = "UTF-8")
+    log_lines <- log_lines[nzchar(trimws(log_lines))]
   }
 
-  log_lines <- readLines(cli_log, warn = FALSE, encoding = "UTF-8")
-  log_lines <- log_lines[nzchar(trimws(log_lines))]
+  # Claude sometimes prints errors to stdout rather than stderr
+  if (length(log_lines) == 0L && length(stdout_lines) > 0L) {
+    log_lines <- stdout_lines[nzchar(trimws(stdout_lines))]
+  }
+
   if (length(log_lines) == 0L) {
     return(sprintf("Claude CLI exited with status %s.", status))
   }
